@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>OpenCollabDraw</title>
+	
+	<style>
+		body{
+			overflow: hidden;
+		}
+		#board{
+			border: 1px solid gray;
+			display: inline-block;
+			cursor: default;
+		}
+		#board canvas{
+			cursor: default;
+		}
+		.color{
+			width: 50px;
+			height: 50px;
+			display: inline-block;
+			margin-right: 5px;
+			margin-left: 5px;
+			cursor: pointer;
+			text-align: center;
+			color: lime;
+			font-size: 30px;
+			margin-bottom: 5px;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="colorpick" >
+		<div class="color" style="background-color: red"></div>
+		<div class="color" style="background-color: blue" id="selected" >✔</div>
+		<div class="color" style="background-color: green"></div>
+		<div class="color" style="background-color: yellow"></div>
+		<div class="color" style="background-color: cyan"></div>
+		<div class="color" style="background-color: black"></div>
+		<div class="color" style="background-color: violet"></div>
+		<div class="color" style="background-color: brown"></div>
+		<div class="color" style="background-color: gray"></div>
+		<div class="color" style="background-color: gold"></div>
+		<div class="color" style="background-color: indigo"></div>
+		<div class="color" style="background-color: pink"></div>
+		<div class="color" style="background-color: orange"></div>
+		Or Pick Other Color: <input id="colorpicker" type="color" />
+	</div>
+	<div id="board"></div>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="kinetic-v4.7.2.min.js" ></script>
+	<script src="opencollabdraw.js" ></script>
+	
+	<script type="text/javascript" defer="defer">
+		
+		var SelectedColor = document.getElementById('selected');
+		
+		function colorClick()
+		{
+			ocd.SetColor( this.style.backgroundColor );
+			
+			if( SelectedColor !== null )
+				SelectedColor.innerHTML = '';
+			
+			SelectedColor = this;
+			SelectedColor.innerHTML = '✔';
+		}
+		function colorPicker()
+		{
+			console.log( this.value );
+			ocd.SetColor( this.value );
+			SelectedColor.innerHTML = '';
+			SelectedColor = null;
+		}
+	
+		var ocd = new OpenCollabDraw( 'board', 1300, 500, 'http://localhost' );
+		ocd.Init();
+		
+		var cels = document.getElementsByClassName('color');
+		for(var i=0; i<cels.length; i++)
+			cels[i].addEventListener('click', colorClick, false );
+			
+		document.getElementById('colorpicker').addEventListener('change',colorPicker,false);
+		
+	</script>
+
+</body>
+
+</html>
