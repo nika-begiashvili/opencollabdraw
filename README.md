@@ -10,6 +10,7 @@ Installation
 install node.js
 
 npm install socket.io express
+
 node server.js
 
 if you want to test opencollabdraw in local network or host it just change 'localhost' 
