@@ -15,21 +15,20 @@ app.use('/', express.static( '../client' ) );
 
 io.sockets.on('connection', Connection );
 
-var Canvas = {
-	Splines: [],
-};
-
 var SplineId = 0;
 
 function Connection(socket)
 {
+	// set default color
 	socket.set('Color', 'blue', function () {} );
 	
+	// set current color
 	socket.on('Color', function(data)
 	{
 		socket.set('Color', data, function(){} );
 	});
-
+	
+	// add point to spline
 	socket.on('Point', function (data) 
 	{
 		socket.get('SplineId', 
@@ -42,6 +41,7 @@ function Connection(socket)
 		
 	});
 	
+	// start drawing new spline
 	socket.on('Spline', function (data) 
 	{
 		socket.get('Color', 
@@ -53,5 +53,11 @@ function Connection(socket)
 				socket.broadcast.emit('Spline', data );
 			}
 		);
+	});
+	
+	// chat message
+	socket.on('ChatMsg', function(data)
+	{
+		socket.broadcast.emit( 'ChatMsg', data );
 	});
 }

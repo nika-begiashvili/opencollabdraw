@@ -29,7 +29,9 @@ OpenCollabDraw.prototype = {
 	_strokeWidth: 5,
 	_lineCap: 'round',
 	_splineTension: 0.5,
-
+	
+	_ChatSelfId: 'me',
+	
 	IsDrawing: false,
 	NewDrawing: true,
 	
@@ -49,16 +51,60 @@ OpenCollabDraw.prototype = {
 		return true;
 	},
 	
+	_AddChatMessage: function( who, msg )
+	{
+		var html = this._ChatContainer.innerHTML;
+		html += '<br />' + (who+':').bold() + msg;
+		this._ChatContainer.innerHTML = html;
+		
+		if( who == this._ChatSelfId )
+			this._socket.emit('ChatMsg', { who: this._Nickname, msg: msg } );
+			
+		this._ChatContainer.scrollTop = this._ChatContainer.scrollHeight;
+	},
+	
 	SetColor: function( color )
 	{
 		this._curStrokeColor = color;
 		this._socket.emit('Color', color );
 	},
+	
+	_InitChat: function( cnf )
+	{
+		var self = this;
+		this._Nickname = cnf.Nickname;
+		this._ChatContainer = document.getElementById( cnf.ChatContainer );
+		this._ChatInput = document.getElementById( cnf.ChatInput );
+		
+		this._ChatInput.addEventListener( 'keypress',
+			function(evt)
+			{
+				if( evt.keyCode == 13 )
+				{
+					var msg = this.value;
+					this.value = '';
+					self._AddChatMessage( self._ChatSelfId , msg );
+					evt.preventDefault();
+				}
+				return true;
+			}
+		);
+		
+		this._socket.on('ChatMsg', 
+			function( data )
+			{
+				self._AddChatMessage( data.who, data.msg );
+			}
+		);
+		
+	},
 
-	Init: function()
+	Init: function( config )
 	{
 		if( !this._CheckDep() ) return;
 		var self = this;
+		if( !config ) config = {};
+		config.EnableChat = config.EnableChat || false;
 		
 		this.stage = new Kinetic.Stage({
 			container: this._container,
@@ -94,6 +140,14 @@ OpenCollabDraw.prototype = {
 		this._updateInterval = setInterval( function(){ self.layer.draw(); } , 1000/60 );
 		
 		this._socket = io.connect( this._websocketAddr );
+		
+		if( config.EnableChat )
+		{
+			if( !config.Nickname || !config.ChatContainer || !config.ChatInput )
+				console.error('chat system requires Nickname, ChatContainer and ChatInput');
+				
+			this._InitChat( config );
+		}
 		
 		this._socket.on('Spline',
 			function (data)

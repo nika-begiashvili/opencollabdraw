@@ -29,6 +29,28 @@
 			font-size: 30px;
 			margin-bottom: 5px;
 		}
+		#chat{
+			position: absolute;
+			z-index: 120;
+			right: 2px;
+			top: 87px;
+			border: 1px solid #afafaf;
+			background-color: #efefef;
+			width: 200px;
+		}
+		#chat input{
+			width: 170px;
+			margin-left: 1px;
+			margin-bottom: 2px;
+		}
+		#chat span{
+			font-weight: 700;
+			font-size: 20px;
+		}
+		#messages{
+			height: 400px;
+			overflow-y: auto;
+		}
 	</style>
 </head>
 
@@ -50,6 +72,15 @@
 		Or Pick Other Color: <input id="colorpicker" type="color" />
 	</div>
 	<div id="board"></div>
+	
+	<div id="chat">
+		<div id="messages">
+			<i>you joined drawing</i>
+		</div>
+		<input id="ChatInput" type="text" />
+		<span>&crarr;</span>
+	</div>
+	
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="kinetic-v4.7.2.min.js" ></script>
 	<script src="opencollabdraw.js" ></script>
@@ -75,10 +106,24 @@
 			SelectedColor.innerHTML = '';
 			SelectedColor = null;
 		}
-	
-		var ocd = new OpenCollabDraw( 'board', 1300, 500, 'http://localhost' );
-		ocd.Init();
 		
+		while( !nickname )
+		{
+			var nickname = prompt('please enter your nickname');
+		}
+		
+		if( nickname )
+		{
+			var ocd = new OpenCollabDraw( 'board', 1400, 600, 'http://localhost' );
+			ocd.Init( 
+				{
+					Nickname: nickname,
+					EnableChat: true,
+					ChatContainer: 'messages',
+					ChatInput: 'ChatInput'
+				} 
+			);
+		}
 		var cels = document.getElementsByClassName('color');
 		for(var i=0; i<cels.length; i++)
 			cels[i].addEventListener('click', colorClick, false );
