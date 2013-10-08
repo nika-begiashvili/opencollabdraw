@@ -16,6 +16,7 @@ app.use('/', express.static( '../client' ) );
 io.sockets.on('connection', Connection );
 
 var SplineId = 0;
+var Nicknames = [];
 
 function Connection(socket)
 {
@@ -59,5 +60,11 @@ function Connection(socket)
 	socket.on('ChatMsg', function(data)
 	{
 		socket.broadcast.emit( 'ChatMsg', data );
+	});
+	
+	// new user joined application
+	socket.on('ChatJoin', function(data)
+	{
+		socket.broadcast.emit( 'ChatMsg', { who: data, msg: 'joined drawing'.italics() } );
 	});
 }

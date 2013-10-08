@@ -90,6 +90,8 @@ OpenCollabDraw.prototype = {
 			}
 		);
 		
+		this._socket.emit('ChatJoin', this._Nickname );
+		
 		this._socket.on('ChatMsg', 
 			function( data )
 			{
